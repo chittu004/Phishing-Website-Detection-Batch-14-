@@ -1,0 +1,304 @@
+HTML Code
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Phishing Website Detection</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="sticky-header">
+      <h1>Phishing Website</h1>
+    </header>
+    <div class="theme-toggle">
+      <label class="switch">
+        <input type="checkbox" id="themeToggle" onclick="toggleTheme()" />
+        <span class="slider round">🌛</span>
+      </label>
+    </div>
+    <div class="container">
+      <input type="text" id="urlInput" placeholder="Enter URL" />
+      <button onclick="checkUrl()">Check</button>
+      <div id="loader" class="loader"></div>
+      <p id="result"></p>
+    </div>
+
+    <footer class="sticky-footer">
+      <p>&copy; Phishing Website</p>
+    </footer>
+    <script src="./script.js"></script>
+  </body>
+</html>
+
+--------------------------------------------------------------------------------------------
+
+CSS Code
+
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: stretch;
+  height: 100vh;
+  background-color: var(--bg-color);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  color: var(--text-color);
+  margin: 0;
+  flex-direction: column;
+  align-content: center;
+  justify-content: flex-start;
+}
+
+.container {
+  text-align: center;
+  background-color: var(--container-bg-color);
+  padding: 20px;
+  border-radius: 25px;
+  box-shadow: 0 0 20px 2px rgb(0 0 0 / 63%);
+  width: 80%;
+  max-width: 400px; /* Adjust max-width as needed for responsiveness */
+  margin: auto; /* Adjust margin for spacing */
+}
+
+input {
+  padding: 10px;
+  width: auto;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+input:focus {
+  outline: 2px solid #00d26a;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  background-color: #00d26a;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #006b36;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  display: none;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+p {
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 100000;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #00000031;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #07070773;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Dark Mode Styles */
+body.dark-theme {
+  --bg-color: #121212;
+  --text-color: #fff;
+  --container-bg-color: #333;
+}
+
+/* Sticky Header Styles */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+  z-index: 1000;
+}
+
+/* Sticky Footer Styles */
+.sticky-footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 0;
+  text-align: center;
+  z-index: 1000;
+}
+
+--------------------------------------------------------------------------
+
+JavaScript Code
+
+// Function to toggle dark theme
+function toggleTheme() {
+  const themeToggle = document.getElementById("themeToggle");
+  const body = document.body;
+
+  if (themeToggle.checked) {
+    body.classList.add("dark-theme");
+  } else {
+    body.classList.remove("dark-theme");
+  }
+}
+
+// Function to parse CSV data
+function parseCsv(data) {
+  const lines = data.trim().split("\n");
+  const headers = lines[0].split(",");
+  const result = [];
+  for (let i = 1; i < lines.length; i++) {
+    const obj = {};
+    const currentline = lines[i].split(",");
+    for (let j = 0; j < headers.length; j++) {
+      obj[headers[j].trim()] = currentline[j].trim();
+    }
+    result.push(obj);
+  }
+  return result;
+}
+
+// Function to normalize URL
+function normalizeUrl(url) {
+  return url.toLowerCase().replace(/\/$/, ""); // Remove trailing slash and convert to lowercase
+}
+
+// Function to check URL security
+function checkUrl() {
+  const urlInput = document.getElementById("urlInput").value.trim();
+  const normalizedInput = normalizeUrl(urlInput);
+  const loader = document.getElementById("loader");
+  const result = document.getElementById("result");
+
+  loader.style.display = "block";
+  result.textContent = "";
+
+  setTimeout(() => {
+    loader.style.display = "none";
+
+    if (!urlInput) {
+      result.textContent = "Please enter a URL";
+      result.style.color = "orange";
+    } else if (!/^https?:\/\//i.test(urlInput)) {
+      result.textContent =
+        "Invalid URL format. Please include 'http://' or 'https://'";
+      result.style.color = "red";
+    } else {
+      // Check against parsed data if needed
+      const found = parsedData.find(
+        (row) => normalizeUrl(row.url) === normalizedInput
+      );
+
+      if (found) {
+        if (found.phishingOrNot.toUpperCase() === "TRUE") {
+          result.textContent = "This is found to be not a secure one";
+          result.style.color = "red";
+        } else {
+          result.textContent = "This is found to be a secure one";
+          result.style.color = "green";
+        }
+      } else {
+        result.textContent = "This is found to be a moderated one";
+        result.style.color = "orange";
+      }
+    }
+  }, 2000); // Simulate loading time
+}
+
+// Theme toggle initialization
+document.addEventListener("DOMContentLoaded", () => {
+  const themeToggle = document.getElementById("themeToggle");
+  themeToggle.addEventListener("change", toggleTheme);
+});
+
+let parsedData = [];
+
+// Fetch and parse CSV data
+fetch("data.csv")
+  .then((response) => response.text())
+  .then((data) => {
+    parsedData = parseCsv(data);
+    console.log("Parsed CSV data:", parsedData); // Debug statement
+  })
+  .catch((error) => console.error("Error fetching CSV:", error));
